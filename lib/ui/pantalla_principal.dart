@@ -18,11 +18,18 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   String busqueda = '';
   String estadoFiltro = 'Todos';
   String prioridadFiltro = 'Todas';
+  final buscador = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     cargar();
+  }
+
+  @override
+  void dispose() {
+    buscador.dispose();
+    super.dispose();
   }
 
   Future<void> cargar() async {
@@ -48,6 +55,15 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     if (prioridad == 'Baja') return const Color(0xFF9E9D9D);
     if (prioridad == 'Media') return const Color(0xFF5564eb);
     return const Color(0xFFCC6666);
+  }
+
+  void restablecerFiltros(){
+    setState(() {
+      buscador.clear();
+      busqueda = '';
+      estadoFiltro = 'Todos';
+      prioridadFiltro = 'Todas';
+    });
   }
 
   Widget resumen(String etiqueta, String valor, IconData icono) {
@@ -162,6 +178,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                             Expanded(
                               flex:3,
                               child: TextField(
+                                controller: buscador,
                                 decoration: const InputDecoration(
                                   labelText: 'Buscar incidencias',
                                   hintText: 'Ejemplo: WiFi, correo, pantalla',
@@ -192,6 +209,21 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                 decoration: const InputDecoration(labelText: 'Prioridad', border: OutlineInputBorder()),
                                 items: ['Todas', 'Baja', 'Media', 'Alta'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                                 onChanged: (v) => setState(() => prioridadFiltro = v ?? 'Todas'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 1,
+                              child: FilledButton.icon(
+                                onPressed: restablecerFiltros,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                                  foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                                  minimumSize: const Size(0, 56),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                ),
+                                icon: const Icon(Icons.filter_alt_off),
+                                label: const Text('Limpiar'),
                               ),
                             ),
                           ],)
